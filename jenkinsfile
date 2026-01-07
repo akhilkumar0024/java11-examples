@@ -1,0 +1,29 @@
+pipeline {
+	agent any
+	stages 
+		stages {
+			stage('Clone Repository'){
+				steps {
+				echo 'Cloning repository...'
+				git branch: 'cicdbranchjenkins', url: 'https://github.com/akhilkumar0024/java11-examples.git'
+				}
+			}
+		 	stage ('Build'){
+                		steps {
+                		echo 'Building code...'
+				sh 'mvn clean package '
+                		}
+        		}
+			stage ('Archive'){
+				steps {
+				echo 'Archiving code...'
+				archive 'target/*.jar'
+				}
+			}
+ 			stage ('Deploy'){
+                		steps {
+                		echo 'Deploying Repository...'
+                		}
+        		}
+	}
+}
