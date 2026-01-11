@@ -1,28 +1,40 @@
 pipeline {
-	agent any
-		stages {
-			stage('Clone Repository'){
-				steps {
-				echo 'Cloning repository...'
-				git branch: 'cicdbranchjenkins', url: 'https://github.com/akhilkumar0024/java11-examples.git'
-				}
-			}
-		 	stage ('Build'){
-                		steps {
-                		echo 'Building code...'
-				sh 'mvn clean package '
-                		}
-        		}
-			stage ('Archive'){
-				steps {
-				echo 'Archiving code...'
-				archiveArtifacts artifacts: 'target/*.jar', followSymlinks: false
-				}
-			}
- 			stage ('Deploy'){
-                		steps {
-                		echo 'Deploying Repository...'
-                		}
-        		}
-	}
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Git checkout...'
+                git branch: 'cicdbranchjenkins', url: 'https://github.com/akhilkumar0024/java11-examples.git'
+            }
+        }
+        stage('Validate, Compile, Test, Package& Verify') {
+            steps {
+                echo 'Building...'
+                sh 'mvn clean verify'
+            }
+        }
+        stage('Install sonarqube cli') {
+            steps {
+                // Step to install SonarQube CLI
+                sh 'sudo wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip'
+                sh 'sudo unzip -o -q sonar-scanner.zip'
+                sh 'sudo rm -rf /opt/sonar-scanner'
+                sh 'sudo mv --force sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner'
+                sh 'sudo sh -c \'echo "#/bin/bash \nexport PATH=\\\"$PATH:/opt/sonar-scanner/bin\\\"" >/etc/profile.d/sonar-scanner.sh\''
+                sh 'sudo chmod +x /opt/sonar-scanner/bin/sonar-scanner'
+                sh '. /etc/profile.d/sonar-scanner.sh'
+            }
+        }
+        stage('Analyzing Code Quality') {
+            steps {
+                // Step to analyze code quality with SonarQube
+                sh '/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectKey=testsonarcloud12345_trialproject -Dsonar.organization=testsonarcloud12345 -Dsonar.qualitygate.wait=false -Dsonar.qualitygate.timeout=300 -Dsonar.sources=src/main/java/ -Dsonar.java.binaries=target/classes -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=2f592bd41346819aa5aad1c982a4f69a00190e09'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+            }
+        }
+    }
 }
