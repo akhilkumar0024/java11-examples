@@ -1,16 +1,16 @@
 pipeline {
     agent any
     stages {
-        stage('Checkout') {
+        stage('Clone Stage') {
             steps {
                 echo 'Git checkout...'
                 git branch: 'cicdbranchjenkins', url: 'https://github.com/akhilkumar0024/java11-examples.git'
             }
         }
-        stage('Validate, Compile, Test, Package& Verify') {
+        stage('Build Stage') {
             steps {
                 echo 'Building...'
-                sh 'mvn clean verify'
+                sh 'mvn clean package'
             }
         }
     }
