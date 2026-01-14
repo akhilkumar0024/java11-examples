@@ -13,5 +13,15 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
+        stage('Deploy to tomcat') {
+            steps {
+                echo 'Deploying to Tomcat...'
+                sh '''
+                curl -u admin:admin123 -T target/*.war http://locahost:8081/manager/text/deploy?path=myapp&update=true
+                echo "Deployed Successfully"
+                '''
+
+            }
+        }   
     }
 }
