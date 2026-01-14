@@ -4,7 +4,7 @@ pipeline {
         stage('Clone Stage') {
             steps {
                 echo 'Git checkout...'
-                git branch: 'cicdbranchjenkins', url: 'https://github.com/akhilkumar0024/java11-examples.git'
+                git branch: 'jenkinsAssignment3', url: 'https://github.com/akhilkumar0024/java11-examples.git'
             }
         }
         stage('Build Stage') {
@@ -17,7 +17,7 @@ pipeline {
             steps {
                 echo 'Deploying to Tomcat...'
                 sh '''
-                curl -u admin:admin123 -T target/*.war http://locahost:8081/manager/text/deploy?path=myapp&update=true
+                curl -u admin:admin123 -T target/*.war http://localhost:8081/manager/text/deploy?path=/myapp&update=true
                 echo "Deployed Successfully"
                 '''
 
